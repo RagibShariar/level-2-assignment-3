@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { Server } from "http";
 import app from "./app";
-import { config } from "./modules/config";
-import connectDB from "./modules/DB";
+import { config } from "./config";
+import connectDB from "./DB";
 
 const port = config.port || 5000;
 let server: Server;
