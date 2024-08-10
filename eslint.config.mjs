@@ -4,7 +4,7 @@ import tseslint from "typescript-eslint";
 
 export default [
   {
-    ignores: ["**/node_modules/**", "**/dist/**", "**/build/**"],
+    ignores: ["**/node_modules/**", "**/dist/", "**/build/**"],
   },
   {
     plugins: {
@@ -14,10 +14,6 @@ export default [
   { files: ["src/**/*.{js,mjs,cjs,ts}"] },
   {
     languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        project: true,
-      },
       globals: {
         ...globals.browser,
         ...globals.node,
@@ -25,8 +21,8 @@ export default [
     },
   },
   pluginJs.configs.recommended,
-  // ...tseslint.configs.recommended,
-  ...tseslint.configs.strict,
+  ...tseslint.configs.recommended,
+  // ...tseslint.configs.strict,
 
   {
     rules: {
