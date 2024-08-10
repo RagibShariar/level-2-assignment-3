@@ -3,8 +3,8 @@ class apiError extends Error {
   errors: string[];
 
   constructor(
+    statusCode: number,
     message = "Something went wrong",
-    statusCode: number = 500,
     errors = [],
     stack = ""
   ) {
