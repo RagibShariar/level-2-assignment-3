@@ -1,12 +1,28 @@
 import app from "./app";
 import { config } from "./modules/config";
+import connectDB from "./modules/DB";
 
 const port = config.port || 5000;
+let server: Server;
 
-app.get("/", (req, res) => {
-  res.send("⚙️ Server is running...");
-});
+connectDB()
+  .then(() => {
+    server = app.listen(port, () => {
+      console.log(`🌐 Server is running on port ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.log(`❌ Database connection error: ${err}`);
+  });
 
-app.listen(port, () => {
-  console.log(`🌐 Server is running on port ${port}`);
+// Handle unhandled promise rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.log(`😈 unhandledRejection is detected at ${promise}, ${reason}`);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
 });
