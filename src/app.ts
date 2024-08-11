@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import authRouter from "./modules/auth/auth.route";
+import facilityRouter from "./modules/facility/facility.route";
 const app = express();
 
 // middlewares
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
 
 // application routes
 app.use("/api/auth", authRouter);
+app.use("/api/facility", facilityRouter);
 
 // global error handler
 app.use(globalErrorHandler);
