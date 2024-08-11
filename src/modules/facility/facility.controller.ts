@@ -27,8 +27,8 @@ const updateFacility = asyncHandler(async (req, res) => {
 
 // soft delete facility
 const deleteFacility = asyncHandler(async (req, res) => {
-  const { _id } = req.params;
-  const result = await facilityService.deleteFacility(_id);
+  const { id } = req.params;
+  const result = await facilityService.deleteFacility(id);
 
   apiResponse(res, httpStatus.OK, "Facility deleted successfully", result);
 });

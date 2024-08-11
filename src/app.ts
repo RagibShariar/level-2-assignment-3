@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import authRouter from "./modules/auth/auth.route";
+import checkAvailabilityRouter from "./modules/checkAvailability/checkAvailability.route";
 import facilityRouter from "./modules/facility/facility.route";
 const app = express();
 
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 // application routes
 app.use("/api/auth", authRouter);
 app.use("/api/facility", facilityRouter);
+app.use("/api/check-availability", checkAvailabilityRouter);
 
 // global error handler
 app.use(globalErrorHandler);
