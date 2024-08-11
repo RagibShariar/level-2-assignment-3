@@ -1,4 +1,6 @@
+import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import { config } from "../../config";
 import { TUser, TUserModel } from "./user.interface";
 
 const userSchema = new mongoose.Schema<TUser, TUserModel>(
@@ -33,15 +35,24 @@ const userSchema = new mongoose.Schema<TUser, TUserModel>(
   { timestamps: true }
 );
 
-// static methods
-userSchema.statics.isUserExist = async function (email) {
-  return await User.findOne({ email: email });
-};
+// hash password before saving
+userSchema.pre("save", async function (next) {
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.bcrypt_salt_round)
+  );
+  next();
+});
 
 // clear password
 userSchema.post("save", async function (doc, next) {
   doc.password = "";
   next();
 });
+
+// static methods
+userSchema.statics.isUserExist = async function (email) {
+  return await User.findOne({ email: email });
+};
 
 export const User = mongoose.model<TUser, TUserModel>("User", userSchema);
