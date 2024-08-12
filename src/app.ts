@@ -4,8 +4,8 @@ import express from "express";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import authRouter from "./modules/auth/auth.route";
 import bookingRouter from "./modules/booking/booking.route";
-import checkAvailabilityRouter from "./modules/checkAvailability/checkAvailability.route";
 import facilityRouter from "./modules/facility/facility.route";
+import { bookingController } from "./modules/booking/booking.controller";
 const app = express();
 
 // middlewares
@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 // application routes
 app.use("/api/auth", authRouter);
 app.use("/api/facility", facilityRouter);
-app.use("/api/check-availability", checkAvailabilityRouter);
+app.get("/api/check-availability", bookingController.checkAvailability);
 app.use("/api/bookings", bookingRouter);
 
 // global error handler

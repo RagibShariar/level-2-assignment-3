@@ -26,11 +26,21 @@ const viewUserBookings = asyncHandler(async (req, res) => {
   apiResponse(res, httpStatus.OK, "Bookings retrieved successfully", result);
 });
 
+// check availability time
+const checkAvailability = asyncHandler(async (req, res) => {
+  const availableSlots = await bookingService.checkAvailability(req.query);
 
-
+  apiResponse(
+    res,
+    httpStatus.OK,
+    "Availability checked successfully",
+    availableSlots
+  );
+});
 
 export const bookingController = {
   createBooking,
   viewAllBookings,
   viewUserBookings,
+  checkAvailability,
 };

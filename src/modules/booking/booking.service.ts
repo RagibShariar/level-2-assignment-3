@@ -7,10 +7,11 @@ import { USER_ROLE } from "../user/user.constant";
 import { User } from "../user/user.model";
 import { TBooking } from "./booking.interface";
 import { Booking } from "./booking.model";
+import { getAvailableTimeSlots, getTimeDifference } from "./booking.utils";
 
 // create a booking
 const createBooking = async (token: string, payload: TBooking) => {
-  const { startTime, endTime } = payload;
+  const { startTime, endTime, date } = payload;
 
   if (!token) {
     throw new apiError(httpStatus.UNAUTHORIZED, `Unauthorize Access`);
@@ -41,22 +42,28 @@ const createBooking = async (token: string, payload: TBooking) => {
     throw new apiError(httpStatus.NOT_FOUND, "Facility not found");
   }
 
+  //* Check if the slot is already booked for that day *//
+  const selectedDate = date || new Date().toISOString().split("T")[0];
+  const existingBooking = await Booking.findOne({
+    date: selectedDate,
+    facility: facility,
+    $or: [{ startTime: { $lt: endTime }, endTime: { $gt: startTime } }],
+  });
+
+  if (existingBooking) {
+    throw new apiError(
+      httpStatus.BAD_REQUEST,
+      "The requested time slot is already booked. Please choose another time."
+    );
+  }
+
   const facilityPrice = facility?.pricePerHour;
 
   //* calculate time *//
-  // Parse the time strings
-  const start = new Date(`1970-01-01T${startTime}:00Z`);
-  const end = new Date(`1970-01-01T${endTime}:00Z`);
+  const totalTime = getTimeDifference(startTime, endTime);
 
-  // Calculate the difference in milliseconds
-  const differenceInMs = end.getTime() - start.getTime();
-
-  // Convert milliseconds to minutes (or hours as needed)
-  const differenceInMinutes = differenceInMs / (1000 * 60);
-  const differenceInHours = differenceInMinutes / 60;
-
-  // payable amount
-  const payableAmount = differenceInHours * facilityPrice;
+  //* calculate payable amount *//
+  const payableAmount = totalTime * facilityPrice;
   // console.log("payable amount: ", payableAmount);
 
   // create booking object
@@ -73,7 +80,7 @@ const createBooking = async (token: string, payload: TBooking) => {
 
 // view all bookings (Admin only)
 const viewAllBookings = async () => {
-  const result = await Booking.find();
+  const result = await Booking.find().populate("facility").populate("user");
 
   return result;
 };
@@ -100,8 +107,63 @@ const viewUserBookings = async (token: string) => {
   return result;
 };
 
+// cancel a booking by user
+const cancelBooking = async (token: string, id: string) => {
+  if (!token) {
+    throw new apiError(httpStatus.UNAUTHORIZED, `Unauthorize Access`);
+  }
+
+  // verify token against access token
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string
+  ) as JwtPayload;
+  const user = await User.findOne({ email: decoded.email });
+  if (!user) {
+    throw new apiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const booking = await Booking.findById(id);
+  if (!booking) {
+    throw new apiError(httpStatus.NOT_FOUND, "Booking not found");
+  }
+
+  const result = await Booking.findByIdAndUpdate(
+    id,
+    { isBooked: "cancelled" },
+    { new: true }
+  );
+  return result;
+};
+
+// check availability time
+const checkAvailability = async (payload: Partial<TBooking>) => {
+  const { date, startTime, endTime } = payload;
+  // const selectedDate = date || new Date().toISOString().split("T")[0];
+
+  const selectedDate = date  || new Date().toLocaleString('en-CA', { timeZone: 'Asia/Dhaka' }).split(",")[0];
+
+  // console.log(`date: `,date);
+  // console.log(`selected date: `,selectedDate);
+
+  // Retrieve bookings for the specified date
+  const bookings = await Booking.find({ date: selectedDate });
+
+  // Generate and calculate available time slots
+  const availableSlots = getAvailableTimeSlots(
+    bookings,
+    startTime || "08:00",
+    endTime || "18:00",
+    120
+  );
+
+  return availableSlots;
+};
+
 export const bookingService = {
   createBooking,
   viewAllBookings,
   viewUserBookings,
+  cancelBooking,
+  checkAvailability,
 };

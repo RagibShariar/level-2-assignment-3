@@ -21,7 +21,6 @@ const updateFacility = async (id: string, payload: TFacility) => {
 
 // soft delete facility
 const deleteFacility = async (id: string) => {
-  console.log(id)
   const result = await Facility.findByIdAndUpdate(id, { isDeleted: true });
   return result;
 };
