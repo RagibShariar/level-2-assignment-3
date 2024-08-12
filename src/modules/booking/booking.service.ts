@@ -21,7 +21,6 @@ const createBooking = async (token: string, payload: TBooking) => {
     token,
     config.jwt_access_secret as string
   ) as JwtPayload;
-  console.log(decoded.email);
 
   // check if the email is registered or not
   const user = await User.findOne({ email: decoded.email });
@@ -43,9 +42,8 @@ const createBooking = async (token: string, payload: TBooking) => {
   }
 
   const facilityPrice = facility?.pricePerHour;
-  // console.log(facilityPrice)
 
-  // calculate time
+  //* calculate time *//
   // Parse the time strings
   const start = new Date(`1970-01-01T${startTime}:00Z`);
   const end = new Date(`1970-01-01T${endTime}:00Z`);
@@ -56,8 +54,6 @@ const createBooking = async (token: string, payload: TBooking) => {
   // Convert milliseconds to minutes (or hours as needed)
   const differenceInMinutes = differenceInMs / (1000 * 60);
   const differenceInHours = differenceInMinutes / 60;
-
-  // console.log(differenceInHours);
 
   // payable amount
   const payableAmount = differenceInHours * facilityPrice;
@@ -75,6 +71,37 @@ const createBooking = async (token: string, payload: TBooking) => {
   return result;
 };
 
+// view all bookings (Admin only)
+const viewAllBookings = async () => {
+  const result = await Booking.find();
+
+  return result;
+};
+
+// view bookings by user email
+const viewUserBookings = async (token: string) => {
+  if (!token) {
+    throw new apiError(httpStatus.UNAUTHORIZED, `Unauthorize Access`);
+  }
+
+  // verify token
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string
+  ) as JwtPayload;
+
+  // check if the email is registered or not
+  const user = await User.findOne({ email: decoded.email });
+  if (!user) {
+    throw new apiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const result = await Booking.find({ user: user?._id });
+  return result;
+};
+
 export const bookingService = {
   createBooking,
+  viewAllBookings,
+  viewUserBookings,
 };

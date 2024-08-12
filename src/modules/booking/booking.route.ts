@@ -14,4 +14,13 @@ bookingRouter.post(
   bookingController.createBooking
 );
 
+
+bookingRouter.get("/",
+  auth(USER_ROLE.admin),
+  bookingController.viewAllBookings);
+
+bookingRouter.get("/user",
+  auth(USER_ROLE.user),
+  bookingController.viewUserBookings)
+
 export default bookingRouter;
