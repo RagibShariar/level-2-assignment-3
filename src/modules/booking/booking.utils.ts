@@ -1,6 +1,6 @@
 import { TBooking } from "./booking.interface";
 
-// Helper to calculate the time difference between two times
+// calculate the time difference between two times (startTime and endTime)
 export const getTimeDifference = (startTime: string, endTime: string) => {
   // Parse the time strings
   const start = new Date(`1970-01-01T${startTime}:00Z`);

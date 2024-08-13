@@ -34,8 +34,6 @@ const createBooking = async (token: string, payload: TBooking) => {
     throw new apiError(httpStatus.FORBIDDEN, "Forbidden access");
   }
 
-  // console.log(user)
-
   // check if the facility is exists
   const facility = await Facility.findById(payload.facility);
   if (!facility) {
@@ -44,6 +42,8 @@ const createBooking = async (token: string, payload: TBooking) => {
 
   //* Check if the slot is already booked for that day *//
   const selectedDate = date || new Date().toISOString().split("T")[0];
+
+  // check if there is already a booking  on that day
   const existingBooking = await Booking.findOne({
     date: selectedDate,
     facility: facility,
@@ -57,20 +57,18 @@ const createBooking = async (token: string, payload: TBooking) => {
     );
   }
 
-  const facilityPrice = facility?.pricePerHour;
-
   //* calculate time *//
   const totalTime = getTimeDifference(startTime, endTime);
 
   //* calculate payable amount *//
+  const facilityPrice = facility?.pricePerHour;
   const payableAmount = totalTime * facilityPrice;
-  // console.log("payable amount: ", payableAmount);
 
   // create booking object
   const bookingData: TBooking = {
     ...payload,
     payableAmount,
-    user: user?._id,
+    user: user?.id,
     isBooked: "confirmed",
   };
 
@@ -118,14 +116,24 @@ const cancelBooking = async (token: string, id: string) => {
     token,
     config.jwt_access_secret as string
   ) as JwtPayload;
+
   const user = await User.findOne({ email: decoded.email });
   if (!user) {
     throw new apiError(httpStatus.NOT_FOUND, "User not found");
   }
 
   const booking = await Booking.findById(id);
+
   if (!booking) {
     throw new apiError(httpStatus.NOT_FOUND, "Booking not found");
+  }
+
+  // check if user has access to this booking
+  if (user?.id !== booking.user.toString()) {
+    throw new apiError(
+      httpStatus.FORBIDDEN,
+      "Forbidden access. This is not your booking"
+    );
   }
 
   const result = await Booking.findByIdAndUpdate(
@@ -136,15 +144,15 @@ const cancelBooking = async (token: string, id: string) => {
   return result;
 };
 
-// check availability time
+// check availability of time slots
 const checkAvailability = async (payload: Partial<TBooking>) => {
   const { date, startTime, endTime } = payload;
-  // const selectedDate = date || new Date().toISOString().split("T")[0];
 
-  const selectedDate = date  || new Date().toLocaleString('en-CA', { timeZone: 'Asia/Dhaka' }).split(",")[0];
-
-  // console.log(`date: `,date);
-  // console.log(`selected date: `,selectedDate);
+  const selectedDate =
+    date ||
+    new Date()
+      .toLocaleString("en-CA", { timeZone: "Asia/Dhaka" })
+      .split(",")[0];
 
   // Retrieve bookings for the specified date
   const bookings = await Booking.find({ date: selectedDate });
@@ -153,7 +161,7 @@ const checkAvailability = async (payload: Partial<TBooking>) => {
   const availableSlots = getAvailableTimeSlots(
     bookings,
     startTime || "08:00",
-    endTime || "18:00",
+    endTime || "24:00",
     120
   );
 

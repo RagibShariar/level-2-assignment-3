@@ -14,13 +14,22 @@ bookingRouter.post(
   bookingController.createBooking
 );
 
-
-bookingRouter.get("/",
+bookingRouter.get(
+  "/",
   auth(USER_ROLE.admin),
-  bookingController.viewAllBookings);
+  bookingController.viewAllBookings
+);
 
-bookingRouter.get("/user",
+bookingRouter.get(
+  "/user",
   auth(USER_ROLE.user),
-  bookingController.viewUserBookings)
+  bookingController.viewUserBookings
+);
+
+bookingRouter.delete(
+  "/:id",
+  auth(USER_ROLE.user),
+  bookingController.cancelBooking
+);
 
 export default bookingRouter;
