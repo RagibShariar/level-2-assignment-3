@@ -50,8 +50,15 @@ The application requires a configuration file to connect to the MongoDB database
 ### .env
 
 ```sh
+NODE_ENV=development
 PORT=5000
-DATABASE_URL="Add your connection string"
+MONGODB_URI=Your_MongoDB_URI
+BCRYPT_SALT_ROUND=
+DEFAULT_PASSWORD=
+JWT_ACCESS_SECRET=
+JWT_ACCESS_EXPIRES_IN=7d
+JWT_REFRESH_SECRET=
+JWT_REFRESH_EXPIRES_IN=14d
 ```
 
 ## User Routes - API Endpoints
