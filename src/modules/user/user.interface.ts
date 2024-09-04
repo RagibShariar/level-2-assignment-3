@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Model } from "mongoose";
 import { USER_ROLE } from "./user.constant";
-import { TOtpVerification } from "../otpVerification/otpVerification.interface";
 
 export type TUser = {
   _id: string;
@@ -16,8 +15,8 @@ export type TUser = {
   otpExpiry: number;
 
   passwordResetToken: string | undefined;
-  passwordResetTokenExpiry: Date |undefined;
-  createPasswordResetToken(): string ;
+  passwordResetTokenExpiry: Date | undefined;
+  createPasswordResetToken(): string;
 };
 
 export type TUserLogin = {

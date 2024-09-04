@@ -82,8 +82,6 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
-  console.log("from frontend", req.body);
-
   // const hostUrl = `${req.protocol}://${req.get('host')}`
   const hostUrl = `http://localhost:5173`;
 
