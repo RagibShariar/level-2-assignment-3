@@ -2,15 +2,15 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
+import notFound from "./middlewares/notFound";
 import authRouter from "./modules/auth/auth.route";
+import { bookingController } from "./modules/booking/booking.controller";
 import bookingRouter from "./modules/booking/booking.route";
 import facilityRouter from "./modules/facility/facility.route";
-import { bookingController } from "./modules/booking/booking.controller";
-import notFound from "./middlewares/notFound";
 const app = express();
 
 // middlewares
-app.use(cors());
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 

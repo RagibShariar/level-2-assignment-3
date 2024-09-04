@@ -20,4 +20,12 @@ authRouter.post(
   authController.userLogin
 );
 
+authRouter.post(
+  "/verify-otp",
+  authController.verifyLoginOtp
+)
+
+authRouter.post("/forgot-password", authController.forgotPassword)
+authRouter.patch("/reset-password/:token", authController.resetPassword);
+
 export default authRouter;

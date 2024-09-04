@@ -17,6 +17,19 @@ const getAllFacilities = asyncHandler(async (req, res) => {
   apiResponse(res, httpStatus.OK, "Facilities retrieved successfully", result);
 });
 
+// get single facility
+const getSingleFacility = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const result = await facilityService.getSingleFacility(id);
+
+  apiResponse(
+    res,
+    httpStatus.OK,
+    "Single Facility retrieved successfully",
+    result
+  );
+});
+
 // update a facility
 const updateFacility = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -36,6 +49,7 @@ const deleteFacility = asyncHandler(async (req, res) => {
 export const facilityController = {
   createFacility,
   getAllFacilities,
+  getSingleFacility,
   updateFacility,
   deleteFacility,
 };

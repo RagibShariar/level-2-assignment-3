@@ -69,7 +69,7 @@ const createBooking = async (token: string, payload: TBooking) => {
     ...payload,
     payableAmount,
     user: user?.id,
-    isBooked: "confirmed",
+    isBooked: "unconfirmed",
   };
 
   const result = await Booking.create(bookingData);
@@ -101,7 +101,7 @@ const viewUserBookings = async (token: string) => {
     throw new apiError(httpStatus.NOT_FOUND, "User not found");
   }
 
-  const result = await Booking.find({ user: user?._id });
+  const result = await Booking.find({ user: user?._id }).populate("facility");
   return result;
 };
 

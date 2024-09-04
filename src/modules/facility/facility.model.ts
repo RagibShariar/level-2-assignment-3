@@ -22,6 +22,10 @@ const facilitySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    imageUrl: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -17,6 +17,10 @@ export const facilityValidationSchema = z.object({
     .min(1, { message: "Location is required and cannot be empty." }),
 
   isDeleted: z.boolean().optional(), // Optional since it has a default value in Mongoose
+
+  imageUrl: z
+    .string()
+    .min(1, { message: "image url is required and cannot be empty." }),
 });
 
 export const updateFacilityValidationSchema = z.object({

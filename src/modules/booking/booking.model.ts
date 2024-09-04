@@ -32,7 +32,7 @@ const bookingSchema = new mongoose.Schema<TBooking>(
     isBooked: {
       type: String,
       enum: ["confirmed", "unconfirmed", "cancelled"],
-      default: "confirmed",
+      default: "unconfirmed",
     },
   },
   { timestamps: true }

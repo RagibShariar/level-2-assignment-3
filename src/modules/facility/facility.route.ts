@@ -18,6 +18,9 @@ facilityRouter.post(
 // get all facilities
 facilityRouter.get("/", facilityController.getAllFacilities);
 
+// get single facility
+facilityRouter.get("/:id", facilityController.getSingleFacility);
+
 // update a facility
 facilityRouter.put(
   "/:id",

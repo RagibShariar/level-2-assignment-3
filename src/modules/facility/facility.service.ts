@@ -13,6 +13,12 @@ const getAllFacilities = async () => {
   return result;
 };
 
+// get a single facility
+const getSingleFacility = async (id: string) => {
+  const result = await Facility.findById(id);
+  return result;
+};
+
 // update a facility
 const updateFacility = async (id: string, payload: TFacility) => {
   const result = await Facility.findByIdAndUpdate(id, payload);
@@ -28,6 +34,7 @@ const deleteFacility = async (id: string) => {
 export const facilityService = {
   createFacility,
   getAllFacilities,
+  getSingleFacility,
   updateFacility,
   deleteFacility,
 };
