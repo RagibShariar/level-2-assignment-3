@@ -28,6 +28,7 @@ export const createUserValidationSchema = z.object({
       invalid_type_error: "Role must be either 'admin' or 'user'.",
     })
     .default("user"),
+  avatar: z.string().optional(),
 });
 
 export const loginValidationSchema = z.object({
