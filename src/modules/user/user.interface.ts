@@ -11,6 +11,8 @@ export type TUser = {
   address?: string;
   role: "admin" | "user";
 
+  avatar?: string;
+
   otp: string;
   otpExpiry: number;
 
