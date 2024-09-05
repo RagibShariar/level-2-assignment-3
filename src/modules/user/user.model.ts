@@ -32,9 +32,6 @@ const userSchema = new mongoose.Schema<TUser, TUserModel>(
       enum: ["admin", "user"],
       default: "user",
     },
-    avatar: {
-      type: String,
-    },
 
     otp: {
       type: String, // Field to store OTP
@@ -93,13 +90,14 @@ userSchema.statics.removeOtpData = async function (email) {
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
 
-  // Hash token
+  // Hash token 
   this.passwordResetToken = crypto
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
   this.passwordResetTokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+  
   return resetToken;
 };
 

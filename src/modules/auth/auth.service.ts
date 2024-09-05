@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import crypto from "crypto";
 import httpStatus from "http-status";
 import jwt from "jsonwebtoken";
 import { config } from "../../config";
@@ -8,6 +7,7 @@ import { sendEmail } from "../../utils/sendEmail";
 import { TUser, TUserLogin } from "../user/user.interface";
 import { User } from "../user/user.model";
 import { generateOTP } from "./auth.utils";
+import crypto from "crypto";
 
 //**  sign up user **//
 const userSignUp = async (payload: TUser) => {
@@ -16,17 +16,56 @@ const userSignUp = async (payload: TUser) => {
   if (isUserExist) {
     throw new apiError(httpStatus.BAD_REQUEST, "Email already exists");
   }
+
+   // Generate OTP
+  const { otp, expiry } = generateOTP();
+  
+  // Send OTP to user's email
+  await sendEmail({
+    to: payload.email,
+    subject: "OTP Verification",
+    html:
+        `
+        <html lang="en" >
+    <head>
+      <meta charset="UTF-8">
+    </head>
+    <body>
+    <div style="font-family: Helvetica,Arial,sans-serif;overflow:auto;line-height:2">
+      <div style="margin:30px auto;width:90%;padding:20px 0">
+        <div style="border-bottom:1px solid #eee">
+        </div>
+        <p style="font-size:1.1em">Hi,</p>
+        <p>Use the following OTP to login. OTP is valid for 5 minutes.</p>
+        <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">${otp}</h2>
+        <p style="font-size:0.9em;">Regards,<br />Book My Play</p>
+        <hr style="border:none;border-top:1px solid #eee" />
+      </div>
+    </div>
+    </body>
+    </html>
+        `,
+  })
+
+
   // create the user
-  const result = await User.create(payload);
+  await User.create({
+    ...payload,
+    otp,
+    otpExpiry: expiry,
+
+  });
 
   // send response without password
-  const userResponse = {
-    ...result.toObject(),
-    password: undefined,
-  };
-  delete userResponse.password;
+  // const userResponse = {
+  //   ...result.toObject(),
+  //   password: undefined,
+  // };
+  // delete userResponse.password;
 
-  return userResponse;
+  return {
+    message: "OTP sent to email. Please verify to login (signup).",
+  };
 };
 
 //* log in user without OTP *//
@@ -88,13 +127,14 @@ const userLogin = async (payload: TUserLogin) => {
 
   // Generate OTP for login verification
   const { otp, expiry } = generateOTP();
-  await User.saveOtp(isUserExist.email, otp, expiry);
+  await User.saveOtp(isUserExist.email, otp , expiry);
 
   // Send OTP to user's email
   await sendEmail({
     to: isUserExist.email,
     subject: "OTP Verification",
-    html: `
+    html:
+        `
         <html lang="en" >
     <head>
       <meta charset="UTF-8">
@@ -114,7 +154,7 @@ const userLogin = async (payload: TUserLogin) => {
     </body>
     </html>
         `,
-  });
+  })
 
   return {
     message: "OTP sent to email. Please verify to login.",
@@ -122,7 +162,7 @@ const userLogin = async (payload: TUserLogin) => {
 };
 
 //* Verify OTP during login *//
-const verifyLoginOtp = async (payload: Partial<TUser>) => {
+const verifyLoginOtp = async (payload:Partial<TUser>) => {
   const { email, otp } = payload;
 
   const isUserExist = await User.isUserExist(payload.email as string);
@@ -135,6 +175,8 @@ const verifyLoginOtp = async (payload: Partial<TUser>) => {
   if (storedOtp !== otp || Date.now() > otpExpiry) {
     throw new apiError(httpStatus.BAD_REQUEST, "Invalid or expired OTP");
   }
+
+
 
   // Generate JWT tokens
   const jwtPayload = {
@@ -164,7 +206,8 @@ const verifyLoginOtp = async (payload: Partial<TUser>) => {
 
 //** forgot password **/
 const forgotPassword = async (email: string, hostUrl: string) => {
-  const user = await User.findOne({ email: email });
+  
+  const user = await User.findOne({ email: email })
   if (!user) {
     throw new apiError(httpStatus.NOT_FOUND, "Email not registered");
   }
@@ -175,7 +218,7 @@ const forgotPassword = async (email: string, hostUrl: string) => {
   await user.save({ validateBeforeSave: false });
 
   //? 3. Send the token back to the user email
-  const resetUrl = `${hostUrl}/reset-password/${resetToken}`;
+  const resetUrl = `${hostUrl}/reset-password/${resetToken}`
 
   await sendEmail({
     to: user.email,
@@ -204,34 +247,28 @@ const forgotPassword = async (email: string, hostUrl: string) => {
     </body>
     </html>
     `,
-  });
+  })
 
   return {
     message: "Password reset link sent to email. Please check your email",
-  };
+  }
 };
 
 // ** reset password **/
 const resetPassword = async (payload: Record<string, unknown>) => {
-  //? 1. If the user exists with the given token & token has not expired
-  // hash params token to match DB hashed token
-  const token = crypto
-    .createHash("sha256")
-    .update(payload.token as string)
-    .digest("hex");
+//? 1. If the user exists with the given token & token has not expired 
+// hash params token to match DB hashed token
+  const token = crypto.createHash("sha256").update(payload.token as string).digest("hex");
 
-  //
+  // 
   const user = await User.findOne({
     passwordResetToken: token,
-    passwordResetTokenExpiry: { $gt: Date.now() },
+    passwordResetTokenExpiry: {$gt: Date.now()}
   });
 
-  if (!user) {
-    throw new apiError(
-      httpStatus.BAD_REQUEST,
-      "The token is invalid or has expired!"
-    );
-  }
+  if (!user) { 
+    throw new apiError(httpStatus.BAD_REQUEST, "The token is invalid or has expired!");
+  };
 
   //? 2. resetting user password
 
@@ -240,19 +277,17 @@ const resetPassword = async (payload: Record<string, unknown>) => {
   user.passwordResetTokenExpiry = undefined;
   user.save();
 
-  return {
-    message: "Password reset successfully. Please log in",
-  };
-};
 
-// ** google login **/
-const googleLogin = async () => {};
+  return {
+  message: "Password reset successfully. Please log in"
+}
+
+}
 
 export const authService = {
   userSignUp,
   userLogin,
   verifyLoginOtp,
   forgotPassword,
-  resetPassword,
-  googleLogin,
+  resetPassword
 };
