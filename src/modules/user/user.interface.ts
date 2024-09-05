@@ -10,7 +10,7 @@ export type TUser = {
   phone?: string;
   address?: string;
   role: "admin" | "user";
-
+  avatar?: string;
   otp: string;
   otpExpiry: number;
 

@@ -10,7 +10,15 @@ import facilityRouter from "./modules/facility/facility.route";
 const app = express();
 
 // middlewares
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://sports-facility-booking-platform-client-khaki.vercel.app",
+    "https://sports-facility-booking-platform-client-766j.vercel.app",
+  ],
+ credentials: true,
+})
+);
 app.use(express.json());
 app.use(cookieParser());
 

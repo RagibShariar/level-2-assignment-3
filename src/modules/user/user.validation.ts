@@ -15,19 +15,24 @@ export const createUserValidationSchema = z.object({
     required_error: "Password is required.",
     invalid_type_error: "Password must be a string.",
   }),
-  phone: z.string({
-    required_error: "Phone number is required.",
-    invalid_type_error: "Phone number must be a string.",
-  }).optional(),
-  address: z.string({
-    required_error: "Address is required.",
-  }).optional(),
+  phone: z
+    .string({
+      required_error: "Phone number is required.",
+      invalid_type_error: "Phone number must be a string.",
+    })
+    .optional(),
+  address: z
+    .string({
+      required_error: "Address is required.",
+    })
+    .optional(),
   role: z
     .enum(["admin", "user"], {
       required_error: "Role is required.",
       invalid_type_error: "Role must be either 'admin' or 'user'.",
     })
     .default("user"),
+  avatar: z.string().optional(),
 });
 
 export const loginValidationSchema = z.object({

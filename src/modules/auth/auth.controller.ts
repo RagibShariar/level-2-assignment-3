@@ -1,7 +1,13 @@
+import axios from "axios";
+import { Request, Response } from "express";
 import httpStatus from "http-status";
+import jwt from "jsonwebtoken";
 import { config } from "../../config";
 import apiResponse from "../../utils/apiResponse";
 import asyncHandler from "../../utils/asyncHandler";
+import { oauth2client } from "../../utils/googleConfig";
+import { USER_ROLE } from "../user/user.constant";
+import { User } from "../user/user.model";
 import { authService } from "./auth.service";
 
 // user sign up
@@ -11,8 +17,8 @@ const userSignUp = asyncHandler(async (req, res) => {
 
   apiResponse(
     res,
-    httpStatus.OK,
-    "OTP sent to email for creating account",
+    httpStatus.CREATED,
+    "Your account has been created. Please log in",
     result
   );
 });
@@ -110,7 +116,6 @@ const resetPassword = asyncHandler(async (req, res) => {
   );
 });
 
-<<<<<<< HEAD
 //** google login **//
 const googleLogin = async (req: Request, res: Response) => {
   try {
@@ -171,20 +176,20 @@ const googleLogin = async (req: Request, res: Response) => {
         address,
       },
     });
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error(error); // Log the error for debugging
+    // console.error(error); // Log the error for debugging
     return res.status(500).json({
       message: "Error while requesting google code",
     });
   }
 };
 
-=======
->>>>>>> parent of 34909dd (add google login)
 export const authController = {
   userSignUp,
   userLogin,
   verifyLoginOtp,
   forgotPassword,
   resetPassword,
+  googleLogin,
 };
