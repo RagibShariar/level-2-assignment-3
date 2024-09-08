@@ -12,6 +12,7 @@ const app = express();
 // middlewares
 app.use(cors({
   origin: [
+    "https://google.labontest.tech",
     "http://localhost:5173",
     "https://sports-facility-booking-platform-client-khaki.vercel.app",
     "https://sports-facility-booking-platform-client-766j.vercel.app",
@@ -23,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
-  res.send("⚙️ Server is running...");
+  res.send("⚙️ GoogleApi Server is running...");
 });
 
 // application routes

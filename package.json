@@ -1,7 +1,7 @@
 {
-  "name": "assignment-3",
+  "name": "sports-facility-booking-system-backend", 
   "version": "1.0.0",
-  "description": "Level 2 - Assignment 3",
+  "description": "sports-facility-booking-system-backend | Level 2 - Assignment 3",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",

@@ -177,6 +177,7 @@ const forgotPassword = async (email: string, hostUrl: string) => {
 
   //? 3. Send the token back to the user email
   const resetUrl = `${hostUrl}/reset-password/${resetToken}`;
+  // const resetUrl = `https://sports-facility-booking-platform-client-khaki.vercel.app/reset-password/${resetToken}`;
 
   await sendEmail({
     to: user.email,
