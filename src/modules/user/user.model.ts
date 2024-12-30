@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema<TUser, TUserModel>(
     password: {
       type: String,
       required: true,
+      select: false,
     },
     phone: {
       type: String,
@@ -31,6 +32,10 @@ const userSchema = new mongoose.Schema<TUser, TUserModel>(
       type: String,
       enum: ["admin", "user"],
       default: "user",
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
     avatar: {
       type: String,

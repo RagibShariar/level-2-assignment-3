@@ -26,6 +26,17 @@ const facilitySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    venueType: {
+      type: String,
+      enum: ["indoor", "outdoor"],
+      required: true,
+    },
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
   { timestamps: true }
 );

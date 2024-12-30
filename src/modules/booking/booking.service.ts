@@ -69,7 +69,7 @@ const createBooking = async (token: string, payload: TBooking) => {
     ...payload,
     payableAmount,
     user: user?.id,
-    isBooked: "unconfirmed",
+    isBooked: "pending",
   };
 
   const result = await Booking.create(bookingData);

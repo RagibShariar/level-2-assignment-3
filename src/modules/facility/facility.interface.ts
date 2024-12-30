@@ -5,4 +5,6 @@ export type TFacility = {
   location: string;
   isDeleted: boolean;
   imageUrl: string;
+  venueType: "indoor" | "outdoor";
+  
 };
